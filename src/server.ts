@@ -5,9 +5,10 @@ import mongoose from 'mongoose';
 import express from 'express';
 
 import * as dblstats from './wrappers/dblstats';
+import * as discordlist from './wrappers/discordlist';
 import * as discord from './wrappers/discord';
 
-import { UserModel } from './structures/user';
+import { User, UserModel } from './structures/user';
 
 import * as storage from './common/storage';
 import config from './common/config';
@@ -75,11 +76,10 @@ app.get('/discord-oauth-callback', async (req, res) => {
             expires_at: Date.now() + tokens.expires_in * 1000
         });
 
-        const { bots } = await dblstats.getUserBots(meData.user.id);
-        if (bots) {
-            const biggestBot = bots.sort((a, b) => b.server_count - a.server_count)[0];
-            console.log(`Created: ${biggestBot.name}; ${biggestBot.server_count} guilds; ${biggestBot.monthly_votes} votes (${biggestBot.id})`);
-            storage.storeTopBot(meData.user.id, biggestBot.id);
+        const bot = await getProvider('top.gg').getBiggestBot(meData.user.id);
+        if (bot) {
+            console.log(`Created: ${bot.name}; ${bot.servers} guilds; ${bot.votes} votes (${bot.id})`);
+            storage.storeTopBot(meData.user.id, bot.id);
         }
 
         await updateMetadata(meData.user.id);
@@ -94,30 +94,53 @@ app.get('/discord-oauth-callback', async (req, res) => {
  * Given a Discord UserId, push static data to the Discord metadata endpoint.
  */
 async function updateMetadata(userId: string) {
-    const tokens = await storage.getDiscordTokens(userId);
-    if (!tokens) return;
+    const user = await storage.getUser(userId);
+    if (!user) return;
 
-    let metadata = {};
+    let platform = {
+        name: 'Unnamed',
+        username: 'top.gg'
+    };
+    let metadata = {
+        guilds: 0,
+        votes: 0,
+    };
+
     try {
         const botId = await storage.getTopBot(userId);
         if (!botId) return;
 
-        const bot = await dblstats.getUserBot(botId);
+        const bot = await getProvider(user.provider).getUserBot(botId);
         if (!bot) return;
 
-        console.log(`Update: ${bot.name}; ${bot.server_count} guilds; ${bot.monthly_votes} votes (${bot.id})`);
+        console.log(`Update: ${bot.name}; ${bot.servers} guilds; ${bot.votes} votes; ${user.provider} (${bot.id})`);
+
+        platform = {
+            name: bot.name,
+            username: user.provider
+        };
 
         metadata = {
-            name: bot.name,
-            guilds: bot.server_count ?? 0,
-            votes: bot.monthly_votes ?? 0,
+            guilds: bot.servers,
+            votes: bot.votes,
         };
     } catch (e) {
         console.error(e);
     }
 
-    await discord.pushMetadata(userId, tokens, metadata);
+    await discord.pushMetadata(userId, user.tokens, platform, metadata);
 }
+
+function getProvider(provider: User['provider']) {
+    switch (provider) {
+        case 'discordlist':
+            return discordlist;
+
+        default:
+            return dblstats;
+    }
+}
+
 
 app.get('*', (req, res) => {
     res.send('👋');

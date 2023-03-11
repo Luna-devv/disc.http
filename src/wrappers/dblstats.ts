@@ -1,10 +1,42 @@
 import config from '../common/config';
-import { TopggBot, TopggUser } from '../types';
+import { Bot } from '../types';
+
+interface TopggUser {
+    id: string;
+    avatar: string | null;
+    def_avatar: string;
+    tag: `${string}#${string}`;
+}
+
+interface TopggBot {
+    certified: boolean;
+    owners: string[];
+    deleted: boolean;
+    id: string;
+    name: string;
+    def_avatar: string;
+    avatar: string | null;
+    short_desc: string;
+    lib: string | null;
+    prefix: string;
+    website: string | null;
+    approved_at: Date | null;
+    monthly_votes: number;
+    server_count: number;
+    total_votes: number;
+    shard_count: number;
+    monthly_votes_rank: number;
+    server_count_rank: number;
+    total_votes_rank: number;
+    shard_count_rank: number;
+    timestamp: Date;
+    unix_timestamp: number;
+}
 
 /**
  * Get all discord bot applications of a user submitted on topgg.
  */
-export async function getUserBots(userId: string): Promise<{ user: TopggUser | undefined, bots: TopggBot[] | undefined }> {
+export async function getBiggestBot(userId: string): Promise<Bot | undefined> {
     const response = await fetch(`https://dblstatistics.com/api/users/${userId}/bots`, {
         headers: {
             Authorization: config.TOPGG_TOKEN,
@@ -13,20 +45,25 @@ export async function getUserBots(userId: string): Promise<{ user: TopggUser | u
     });
 
     if (response.ok) {
-        const bots: { user: TopggUser, bots: TopggBot[] } = await response.json();
-        return bots;
-    } else {
+        const { bots } = await response.json() as { user: TopggUser | undefined, bots: TopggBot[] | undefined };
+        const bot = (bots || []).sort((a, b) => b.server_count - a.server_count)[0];
+
         return {
-            user: undefined,
-            bots: undefined
+            name: bot.name,
+            id: bot.id,
+            servers: bot.server_count,
+            votes: bot.monthly_votes,
+            shards: bot.shard_count
         };
+    } else {
+        return undefined;
     }
 }
 
 /**
  * Get a discord bot applications of a user submitted on topgg.
  */
-export async function getUserBot(botId: string): Promise<TopggBot | undefined> {
+export async function getUserBot(botId: string): Promise<Bot | undefined> {
     const response = await fetch(`https://dblstatistics.com/api/bots/${botId}`, {
         headers: {
             Authorization: config.TOPGG_TOKEN,
@@ -36,7 +73,13 @@ export async function getUserBot(botId: string): Promise<TopggBot | undefined> {
 
     if (response.ok) {
         const bot: TopggBot = await response.json();
-        return bot;
+        return {
+            name: bot.name,
+            id: bot.id,
+            servers: bot.server_count,
+            votes: bot.monthly_votes,
+            shards: bot.shard_count
+        };
     } else {
         return undefined;
     }

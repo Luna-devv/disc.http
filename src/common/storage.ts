@@ -13,9 +13,9 @@ export async function storeDiscordTokens(userId: string, tokens: DiscordData) {
     await user.save();
 }
 
-export async function getDiscordTokens(userId: string): Promise<DiscordData | undefined> {
+export async function getUser(userId: string): Promise<User | undefined> {
     const user = await UserModel.findOne({ user: userId });
-    return user?.tokens;
+    return user || undefined;
 }
 
 /**

@@ -40,36 +40,12 @@ export interface DiscordData {
     refresh_token: string;
 }
 
-export interface TopggUser {
-    id: string;
-    avatar: string | null;
-    def_avatar: string;
-    tag: `${string}#${string}`;
-}
-
-export interface TopggBot {
-    certified: boolean;
-    owners: string[];
-    deleted: boolean;
-    id: string;
+export interface Bot {
     name: string;
-    def_avatar: string;
-    avatar: string | null;
-    short_desc: string;
-    lib: string | null;
-    prefix: string;
-    website: string | null;
-    approved_at: Date | null;
-    monthly_votes: number;
-    server_count: number;
-    total_votes: number;
-    shard_count: number;
-    monthly_votes_rank: number;
-    server_count_rank: number;
-    total_votes_rank: number;
-    shard_count_rank: number;
-    timestamp: Date;
-    unix_timestamp: number;
+    id: string;
+    servers: number;
+    votes: number;
+    shards: number;
 }
 
 export interface InteractionCommand {

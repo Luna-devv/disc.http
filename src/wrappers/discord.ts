@@ -114,16 +114,27 @@ export async function getUserData(tokens: OAuth2TokenResponse) {
  * Given metadata that matches the schema, push that data to Discord on behalf
  * of the current user.
  */
-export async function pushMetadata(userId: string, tokens: DiscordData, metadata: Record<string, string>) {
+export async function pushMetadata(
+    userId: string,
+    tokens: DiscordData,
+    platform: {
+        name: string;
+        username: string
+    },
+    metadata: {
+        guilds: number,
+        votes: number
+    },
+) {
     const url = `https://discord.com/api/v10/users/@me/applications/${config.DISCORD_CLIENT_ID}/role-connection`;
     const accessToken = await getAccessToken(userId, tokens);
+
     const body = {
-        platform_name: metadata.name,
-        metadata: (() => {
-            delete metadata.name;
-            return metadata;
-        })(),
+        platform_name: `${platform.name} on ${platform.username}`,
+        // platform_username: platform.name,
+        metadata,
     };
+
     const response = await fetch(url, {
         method: 'PUT',
         body: JSON.stringify(body),
@@ -132,6 +143,7 @@ export async function pushMetadata(userId: string, tokens: DiscordData, metadata
             'Content-Type': 'application/json',
         },
     });
+
     if (!response.ok) {
         throw new Error(`Error pushing discord metadata: [${response.status}] ${response.statusText}`);
     }

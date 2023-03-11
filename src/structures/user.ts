@@ -11,7 +11,7 @@ const schema = new mongoose.Schema<User>({
         refresh_token: { type: String },
     },
 
-    provider: { type: String, required: true, default: 'topgg' },
+    provider: { type: String, required: true, default: 'top.gg' },
 });
 
 export interface User {
@@ -20,7 +20,7 @@ export interface User {
 
     tokens: DiscordData;
 
-    provider: 'topgg'
+    provider: 'top.gg' | 'discordlist'
 }
 
 export const UserModel = mongoose.model('user', schema);
