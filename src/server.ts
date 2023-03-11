@@ -103,8 +103,8 @@ app.listen(port, () => {
         const users = (await UserModel.find()).filter((u) => u.bot);
 
         users.forEach(async (user, index) => {
-            setTimeout(() => updateMetadata(user.user), ((1000 * 60 * 6) / users.length) * index);
+            setTimeout(() => updateMetadata(user.user), ((1000 * 60 * 60) / users.length) * index);
         });
 
-    }, 1000 * 60 * 6);
+    }, 1000 * 60 * 60);
 });
