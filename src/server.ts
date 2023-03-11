@@ -49,7 +49,7 @@ app.get('/discord-oauth-callback', async (req, res) => {
         const { bots } = await getUserBots(meData.user.id);
         if (bots) {
             const biggestBot = bots.sort((a, b) => b.server_count - a.server_count)[0];
-            console.log(biggestBot);
+            console.log(`Created: ${biggestBot.name}; ${biggestBot.server_count} guilds; ${biggestBot.monthly_votes} votes (${biggestBot.id})`);
             storage.storeTopBot(meData.user.id, biggestBot.id);
         }
 
@@ -76,6 +76,8 @@ async function updateMetadata(userId: string) {
         const bot = await getUserBot(botId);
         if (!bot) return;
 
+        console.log(`Update: ${bot.name}; ${bot.server_count} guilds; ${bot.monthly_votes} votes (${bot.id})`);
+
         metadata = {
             name: bot.name,
             guilds: bot.server_count ?? 0,
@@ -101,10 +103,7 @@ app.listen(port, () => {
         const users = (await UserModel.find()).filter((u) => u.bot);
 
         users.forEach(async (user, index) => {
-            setTimeout(() => {
-                updateMetadata(user.user);
-                console.log(`Update: ${user.user}`);
-            }, ((1000 * 60 * 6) / users.length) * index);
+            setTimeout(() => updateMetadata(user.user), ((1000 * 60 * 6) / users.length) * index);
         });
 
     }, 1000 * 60 * 6);
