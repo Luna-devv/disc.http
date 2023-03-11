@@ -1,43 +1,44 @@
-# Linked Role example app
+# Bot Stats (linked role)
 
-This repository contains the documentation and example for a linked role bot.
-
-> ❇️ A version of this code is also hosted [on Glitch 🎏](https://glitch.com/edit/#!/linked-role-discord-bot)
+This repository contains the documentation and source for a linked role bot that shows the biggest bot of a user in their profile.
+> ![image](https://user-images.githubusercontent.com/71079641/224494178-c316fb5a-efd8-42ef-bb1a-f60405246651.png)
 
 ## Project structure
 All of the files for the project are on the left-hand side. Here's a quick glimpse at the structure:
 
 ```
-├── assets          -> Images used in this tutorial
+├── assets    -> Images used in this tutorial
 ├── src
-│   ├── config.js   -> Parsing of local configuration
-│   ├── discord.js  -> Discord specific auth & API wrapper
-│   ├── register.js -> Tool to register the metadata schema
-│   ├── server.js   -> Main entry point for the application
-│   ├── storage.js  -> Provider for storing OAuth2 tokens
-├── .env -> your credentials and IDs
+│   ├── common
+│   │   ├── config.ts   -> Parsing of local configuration
+│   │   └── storage.ts  -> Provider for storing OAuth2 tokens and bot ids
+│   ├── scripts
+│   │   └── register.ts -> Tool to register the metadata schema
+│   ├── structures
+│   │   └── user.ts -> Mongo database schema for users
+│   ├── wrappers
+│   │   ├── discord.ts    -> Discord specific auth & API wrapper
+│   │   └── dblstats.ts   -> dblstatistics.com specific auth & API wrapper
+│   ├── server.ts -> Main entry point for the application
+│   ├── types.ts  -> All the typescript interfaces
+├── .env  -> your credentials and IDs
 ├── .gitignore
 ├── package.json
 └── README.md
 ```
 
-## Running app locally
-
-Before you start, you'll need to [create a Discord app](https://discord.com/developers/applications) with the `bot` scope
-
-Configuring the app is covered in detail in the [tutorial](https://discord.com/developers/docs/tutorials/configuring-app-metadata-for-linked-roles).
-
 ### Setup project
 
 First clone the project:
 ```
-git clone https://github.com/discord/linked-roles-sample.git
+git clone https://github.com/Luna-devv/linked-roles-sample.git
 ```
 
-Then navigate to its directory and install dependencies:
+Then navigate to its directory, install dependencies and compile:
 ```
 cd linked-roles-sample
-npm install
+yarn install
+yarn tsc
 ```
 
 ### Get app credentials
@@ -45,36 +46,36 @@ npm install
 Fetch the credentials from your app's settings and add them to a `.env` file. You'll need your bot token (`DISCORD_TOKEN`), client ID (`DISCORD_CLIENT_ID`), client secret (`DISCORD_CLIENT_SECRET`). You'll also need a redirect URI (`DISCORD_REDIRECT_URI`) and a randomly generated UUID (`COOKIE_SECRET`), which are both explained below:
 
 ```
-DISCORD_CLIENT_ID: <your OAuth2 client Id>
-DISCORD_CLIENT_SECRET: <your OAuth2 client secret>
-DISCORD_TOKEN: <your bot token>
+MONGO_URL: <mongo connection string>
+TOPGG_TOKEN: <dblstatistics.com token>
+DISCORD_CLIENT_ID: <OAuth2 client Id>
+DISCORD_CLIENT_SECRET: <OAuth2 client secret>
+DISCORD_TOKEN: <bot token>
 DISCORD_REDIRECT_URI: https://<your-project-url>/discord-oauth-callback
 COOKIE_SECRET: <random generated UUID>
 ```
 
 For the UUID (`COOKIE_SECRET`), you can run the following commands:
-
-```
+```bash
 $ node
 crypto.randomUUID()
 ```
 
-Copy and paste the value into your `.env` file.
-
-Fetching credentials is covered in detail in the [linked roles tutorial](https://discord.com/developers/docs/tutorials/configuring-app-metadata-for-linked-roles).
-
 ### Running your app
 
 After your credentials are added, you can run your app:
-
-```
-$ node server.js
+```bash
+$ node .
 ```
 
 And, just once, you need to register you connection metadata schema. In a new window, run:
-
+```bash
+$ npm run register
 ```
-$ node src/register.js
+
+And, if you are wanting to develop on it and change code. In a new window, run:
+```bash
+yarn tsc --watch
 ```
 
 ### Set up interactivity
@@ -110,5 +111,5 @@ Click **Save Changes** and restart your app.
 
 ## Other resources
 - Read **[the tutorial](https://discord.com/developers/docs/tutorials/configuring-app-metadata-for-linked-roles)** for in-depth information.
-- Browse https://github.com/JustinBeckwith/fitbit-discord-bot/ for a more in-depth example using the Fitbit API
+- Join the **[Someone's server](https://discord.gg/yYd6YKHQZH)**  to ask questions about this project and other dev related talk.
 - Join the **[Discord Developers server](https://discord.gg/discord-developers)** to ask questions about the API, attend events hosted by the Discord API team, and interact with other devs.
