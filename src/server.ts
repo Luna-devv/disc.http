@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import express from 'express';
 
-import { getUserBot, getUserBots } from './wrappers/dblstats';
+import * as dblstats from './wrappers/dblstats';
 import * as discord from './wrappers/discord';
 
 import { UserModel } from './structures/user';
@@ -32,6 +32,8 @@ commandLoader();
 client.start();
 
 client.on('interactionCreate', async (interaction: Interaction) => {
+    interaction.deferReply(true);
+
     const command = await storage.getCommand(interaction.commandName || 'debug');
     if (!command) return;
 
@@ -73,7 +75,7 @@ app.get('/discord-oauth-callback', async (req, res) => {
             expires_at: Date.now() + tokens.expires_in * 1000
         });
 
-        const { bots } = await getUserBots(meData.user.id);
+        const { bots } = await dblstats.getUserBots(meData.user.id);
         if (bots) {
             const biggestBot = bots.sort((a, b) => b.server_count - a.server_count)[0];
             console.log(`Created: ${biggestBot.name}; ${biggestBot.server_count} guilds; ${biggestBot.monthly_votes} votes (${biggestBot.id})`);
@@ -100,7 +102,7 @@ async function updateMetadata(userId: string) {
         const botId = await storage.getTopBot(userId);
         if (!botId) return;
 
-        const bot = await getUserBot(botId);
+        const bot = await dblstats.getUserBot(botId);
         if (!bot) return;
 
         console.log(`Update: ${bot.name}; ${bot.server_count} guilds; ${bot.monthly_votes} votes (${bot.id})`);

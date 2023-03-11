@@ -1,4 +1,4 @@
-import { UserModel } from '../structures/user';
+import { User, UserModel } from '../structures/user';
 import { DiscordData, InteractionCommand } from '../types';
 
 /**
@@ -33,6 +33,23 @@ export async function storeTopBot(userId: string, botId: string) {
 export async function getTopBot(userId: string): Promise<string | undefined> {
     const user = await UserModel.findOne({ user: userId });
     return user?.bot;
+}
+
+/**
+ * Stores the provider that a user wants to use to fetch data off.
+ */
+
+export async function storeProvider(userId: string, provider: User['provider']) {
+    let user = await UserModel.findOne({ user: userId });
+    if (!user) user = await UserModel.create({ user: userId });
+
+    user.provider = provider;
+    await user.save();
+}
+
+export async function getProvider(userId: string): Promise<string | undefined> {
+    const user = await UserModel.findOne({ user: userId });
+    return user?.provider;
 }
 
 /**

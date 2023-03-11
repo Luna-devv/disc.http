@@ -3,9 +3,8 @@ import { InteractionCommand } from '../types';
 export default {
     name: 'debug',
     run: (interaction) => {
-        return interaction.reply({
-            content: 'Pong!',
-            ephemeral: true,
+        return interaction.editReply({
+            content: 'Pong!'
         });
     },
 } as InteractionCommand;

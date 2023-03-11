@@ -9,7 +9,9 @@ const schema = new mongoose.Schema<User>({
         access_token: { type: String },
         expires_at: { type: Number },
         refresh_token: { type: String },
-    }
+    },
+
+    provider: { type: String, required: true, default: 'topgg' },
 });
 
 export interface User {
@@ -18,7 +20,7 @@ export interface User {
 
     tokens: DiscordData;
 
-    save: () => void;
+    provider: 'topgg'
 }
 
 export const UserModel = mongoose.model('user', schema);
