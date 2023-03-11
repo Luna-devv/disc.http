@@ -1,3 +1,5 @@
+import type Interaction from 'interactions.js/typings/structures/Interaction';
+
 export interface OAuth2TokenResponse {
     access_token: string;
     expires_in: number;
@@ -68,4 +70,14 @@ export interface TopggBot {
     shard_count_rank: number;
     timestamp: Date;
     unix_timestamp: number;
+}
+
+export interface InteractionCommand {
+    name: string;
+    aliases: string[];
+    i18n: {
+        name: string;
+        type: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+    };
+    run: (interaction: Interaction) => Promise<void>;
 }

@@ -1,16 +1,43 @@
+import type Interaction from 'interactions.js/typings/structures/Interaction';
+import { Application } from 'interactions.js';
 import cookieParser from 'cookie-parser';
+import mongoose from 'mongoose';
 import express from 'express';
 
 import { getUserBot, getUserBots } from './wrappers/dblstats';
 import * as discord from './wrappers/discord';
+
+import { UserModel } from './structures/user';
+
 import * as storage from './common/storage';
 import config from './common/config';
-import mongoose from 'mongoose';
-import { UserModel } from './structures/user';
+
+import commandLoader from './common/commandLoader';
 
 const app = express();
 app.use(cookieParser(config.COOKIE_SECRET));
 mongoose.connect(config.MONGO_URL).catch(console.log);
+
+/**
+ * Initializes a HTTP bot client using interactions.js to reply to
+ * interaction commands (/) inside of discord.
+ */
+const client = new Application({
+    botToken: config.DISCORD_TOKEN,
+    publicKey: config.DISCORD_PUBLIC_KEY,
+    applicationId: config.DISCORD_CLIENT_ID,
+    port: 1337
+});
+commandLoader();
+client.start();
+
+client.on('interactionCreate', async (interaction: Interaction) => {
+    const command = await storage.getCommand(interaction.commandName || 'debug');
+    if (!command) return;
+
+    command.run(interaction);
+});
+
 
 /**
  * Route configured in the Discord developer console which facilitates the

@@ -18,8 +18,8 @@
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "mongoose": "^7.0.1",
-    "node-fetch": "^3.3.0"
+    "interactions.js": "https://github.com/fb-sean/interactions.js",
+    "mongoose": "^7.0.1"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.3",

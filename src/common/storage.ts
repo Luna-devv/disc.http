@@ -1,5 +1,5 @@
 import { UserModel } from '../structures/user';
-import { DiscordData } from '../types';
+import { DiscordData, InteractionCommand } from '../types';
 
 /**
  * Stores Discord's token data in a database for later use.
@@ -33,4 +33,18 @@ export async function storeTopBot(userId: string, botId: string) {
 export async function getTopBot(userId: string): Promise<string | undefined> {
     const user = await UserModel.findOne({ user: userId });
     return user?.bot;
+}
+
+/**
+ * Stores all application commands.
+ */
+
+const commandStore = new Map<string, InteractionCommand>();
+
+export async function storeCommand(command: InteractionCommand) {
+    await commandStore.set(command.name ?? '', command);
+}
+
+export async function getCommand(name: string): Promise<InteractionCommand | undefined> {
+    return await commandStore.get(name);
 }
