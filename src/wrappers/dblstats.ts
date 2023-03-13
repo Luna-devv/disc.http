@@ -45,7 +45,7 @@ export async function getBiggestBot(userId: string): Promise<Bot | undefined> {
     });
 
     if (response.ok) {
-        const { bots } = await response.json() as { user: TopggUser | undefined, bots: TopggBot[] | undefined };
+        const { bots } = await response.json() as { user: TopggUser, bots: TopggBot[] };
         const bot = (bots || []).sort((a, b) => b.server_count - a.server_count)[0];
 
         return {

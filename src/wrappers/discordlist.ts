@@ -66,8 +66,7 @@ export async function getBiggestBot(userId: string): Promise<Bot | undefined> {
     });
 
     if (response.ok) {
-        const user = await response.json() as DiscordlistUser | undefined;
-        if (!user) return undefined;
+        const user = await response.json() as DiscordlistUser;
 
         const bots: Bot[] = [];
         for await (const botId of user.bots) {
