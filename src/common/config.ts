@@ -7,6 +7,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 const config = {
+    VITALLIST_TOKEN: process.env.TOPGG_TOKEN as string,
     TOPGG_TOKEN: process.env.TOPGG_TOKEN as string,
     DISCORDLIST_TOKEN: process.env.DISCORDLIST_TOKEN as string,
 

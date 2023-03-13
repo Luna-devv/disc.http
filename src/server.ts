@@ -6,6 +6,7 @@ import express from 'express';
 
 import * as dblstats from './wrappers/dblstats';
 import * as discordlist from './wrappers/discordlist';
+import * as vitallist from './wrappers/vitallist';
 import * as discord from './wrappers/discord';
 
 import { User, UserModel } from './structures/user';
@@ -76,7 +77,8 @@ app.get('/discord-oauth-callback', async (req, res) => {
             expires_at: Date.now() + tokens.expires_in * 1000
         });
 
-        const bot = await getProvider('top.gg').getBiggestBot(meData.user.id);
+        const user = await storage.getUser(meData.user.id);
+        const bot = await getProvider(user?.provider || 'top.gg').getBiggestBot(meData.user.id);
         if (bot) {
             console.log(`Created: ${bot.name}; ${bot.servers} guilds; ${bot.votes} votes (${bot.id})`);
             storage.storeTopBot(meData.user.id, bot.id);
@@ -133,8 +135,10 @@ async function updateMetadata(userId: string) {
 
 function getProvider(provider: User['provider']) {
     switch (provider) {
-        case 'discordlist':
+        case 'dlist.gg':
             return discordlist;
+        case 'vitallist.xyz':
+            return vitallist;
 
         default:
             return dblstats;

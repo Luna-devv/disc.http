@@ -20,7 +20,7 @@ export interface User {
 
     tokens: DiscordData;
 
-    provider: 'top.gg' | 'discordlist'
+    provider: 'top.gg' | 'dlist.gg' | 'vitallist.xyz'
 }
 
 export const UserModel = mongoose.model('user', schema);

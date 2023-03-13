@@ -18,9 +18,11 @@ export default {
 
 function getEmote(provider: User['provider']): string {
     switch (provider) {
-        case 'discordlist':
+        case 'dlist.gg':
             return '<:yah:982585208417161258>';
-        case 'top.gg':
+        case 'vitallist.xyz':
+            return '<:VD_VitalList:1006506267319226368>';
+        default:
             return '<:topgg:1017511725353939114>';
     }
 }
